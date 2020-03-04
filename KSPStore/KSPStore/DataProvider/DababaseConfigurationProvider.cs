@@ -1,0 +1,215 @@
+﻿using KSPStore.Models;
+using KSPStore.ViewModel.Employee;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+
+namespace KSPStore.DataProvider
+{
+
+    public class DababaseConfigurationProvider
+    {
+        // For set database configuration
+        public string conString = "server=(localdb)\\MSSQLLocalDB;database=kspStoreDB_0001; Trusted_Connection=true";
+
+
+        public static IConfiguration Configuration;
+
+        // for ado.net
+        public SqlConnection con = new SqlConnection();
+        public SqlCommand cmd;
+
+        public DababaseConfigurationProvider()
+        {
+            // for get configuration connectionString from appsettings.json
+            con.ConnectionString = Configuration.GetConnectionString("KspStoreDBCon");
+            cmd = con.CreateCommand();
+        }
+        // insert method
+        public void Insert(Employee model)
+        {
+            try
+            {
+                string query = "Insert into Employee values('" + model.Name + "', '" + model.UserName + "', '" + model.Address + "'," +
+                    " '" + model.Email + "', '" + model.Password + "')";
+
+                con.Open();
+                cmd.CommandText = query;
+                cmd.ExecuteScalar();
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+        // update method
+        public void Update(Employee model)
+        {
+            try
+            {
+                string query = "Update Employee set " +
+                    "Name = '" + model.Name + "', UserName = '" + model.UserName + "',  Address = '" + model.Address + "', Email = '" + model.Email + "'," +
+                    " Password='" + model.Password + "' where Id = " + model.Id;
+
+
+                con.Open();
+                cmd.CommandText = query;
+                cmd.ExecuteScalar();
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+        // Get all employee method
+        public IEnumerable<Employee> GetAll()
+        {
+            List<Employee> empList = new List<Employee>();
+            try
+            {
+
+                string query = "select * from Employee";
+                cmd.CommandText = query;
+
+                con.Open();
+                var data = cmd.ExecuteReader();
+                while (data.Read())
+                {
+                    var emp = new Employee
+                    {
+                        Id = (int)data["Id"],
+                        Name = data["Name"].ToString(),
+                        UserName = data["UserName"].ToString(),
+                        Address = data["Address"].ToString(),
+                        Email = data["Email"].ToString(),
+                        Password = data["Password"].ToString()
+                    };
+
+                    empList.Add(emp);
+
+                }
+
+            }
+            finally
+            {
+                con.Close();
+            }
+            return empList;
+        }
+
+        // get via id
+        public Employee GetById(int id)
+        {
+            string query = "select * from Employee where Id = " + id;
+            cmd.CommandText = query;
+            var model = new Employee();
+
+            try
+            {
+                con.Open();
+                var data = cmd.ExecuteReader();
+
+                while (data.Read())
+                {
+
+                    model.Id = (int)data["Id"];
+                    model.Name = data["Name"].ToString();
+                    model.UserName = data["UserName"].ToString();
+                    model.Address = data["Address"].ToString();
+                    model.Email = data["Email"].ToString();
+                    model.Password = data["Password"].ToString();
+
+                }
+
+            }
+            finally
+            {
+                con.Close();
+            }
+
+            return model;
+        }
+
+        // Delete method via id
+        public void Delete(int id)
+        {
+            string query = "delete Employee where Id = " + id;
+            cmd.CommandText = query;
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                con.Close();
+            }
+
+        }
+
+        //testing purpose
+        public ReadTwoTableDataConcurrently GetAllValueFromDifferentTable()
+        {
+            ReadTwoTableDataConcurrently newDataFromTwoTable;
+            try
+            {
+                string query = "select * from Employee; select * from EmpTags";
+                cmd.CommandText = query;
+                con.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                List<Employee> employees = new List<Employee>();
+                // read first table data
+                while (reader.Read())
+                {
+                    var emp = new Employee
+                    {
+                        Id = (int)reader["Id"],
+                        Name = reader["Name"].ToString(),
+                        UserName = reader["UserName"].ToString(),
+                        Address = reader["Address"].ToString(),
+                        Email = reader["Email"].ToString()
+                    };
+                    employees.Add(emp);
+
+
+
+                }
+
+                // testing purpose: Get value from two different table
+                List<NewClass> secondData = new List<NewClass>();
+                    reader.NextResult();
+                    while (reader.Read())
+                    {
+                        var data = new NewClass
+                        {
+                            Id = (int)reader["Id"],
+                            CategoryName = reader["CategoryName"].ToString()
+                        };
+                        secondData.Add(data);
+                    }
+                
+                newDataFromTwoTable = new ReadTwoTableDataConcurrently
+                {
+                    Employees = employees,
+                    NewClasses = secondData
+                };
+                reader.Close();
+            }
+            finally
+            {
+
+                con.Close();
+            }
+            return newDataFromTwoTable;
+        }
+    }
+    // testing purpose: Get value from two different table
+    public class NewClass
+    {
+        public int Id { get; set; }
+        public string CategoryName { get; set; }
+    }
+}

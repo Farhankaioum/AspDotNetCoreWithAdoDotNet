@@ -1,0 +1,67 @@
+﻿@model IEnumerable<Employee>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1>Welcome</h1>
+
+<p>
+    <a asp-action="Create" asp-controller="Employee">Create New</a>
+</p>
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>UserName</th>
+            <th>Address</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var emp in Model)
+        {
+            <tr>
+                <td>@emp.Name</td>
+                <td>@emp.UserName</td>
+                <td>@emp.Address</td>
+                <td>@emp.Email</td>
+                <td>
+                    <input type="hidden" asp-for="@emp.Id" />
+                    <a asp-action="Detail" asp-route-id="@emp.Id" class="btn btn-success">View</a>
+                    <a asp-action="Update" asp-route-id="@emp.Id" class="btn btn-info">Edit</a>
+
+                    @*adding modal in delete button*@
+                    <a  data-toggle="modal" href="#" data-target="#deleteModal" class="btn btn-danger text-white">Delete</a>
+                    <!-- Modal -->
+                    <div class="modal fade" id="deleteModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="deleteModal" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Delete Confirmation</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure? <br />
+                                    <small class="text-muted">If once delete, don't undone this value!</small>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                                    <form asp-action="Delete" asp-route-id="@emp.Id" method="post">
+                                        <button type="submit" class="btn btn-danger">OK</button>
+                                    </form>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

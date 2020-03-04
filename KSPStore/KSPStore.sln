@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KSPStore", "KSPStore\KSPStore.csproj", "{C9804823-AC16-469C-9431-320F92CBA5BB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C9804823-AC16-469C-9431-320F92CBA5BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9804823-AC16-469C-9431-320F92CBA5BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9804823-AC16-469C-9431-320F92CBA5BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9804823-AC16-469C-9431-320F92CBA5BB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {02B0EAEA-B4F6-4257-B464-7AF1303CDE1F}
+	EndGlobalSection
+EndGlobal

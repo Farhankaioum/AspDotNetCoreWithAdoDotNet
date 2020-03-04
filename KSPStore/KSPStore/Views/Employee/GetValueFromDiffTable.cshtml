@@ -1,0 +1,49 @@
+﻿@using KSPStore.ViewModel.Employee
+@model ReadTwoTableDataConcurrently
+
+    <div class="container">
+        <h3>Table One</h3>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>UserName</th>
+                    <th>Address</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var data in @Model.Employees)
+                {
+                    <tr>
+                        <td>@data.Id</td>
+                        <td>@data.Name</td>
+                        <td>@data.UserName</td>
+                        <td>@data.Address</td>
+                        <td>@data.Email</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h3>Table Two</h3>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Category Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var data in @Model.NewClasses)
+                {
+                    <tr>
+                        <td>@data.Id</td>
+                        <td>@data.CategoryName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
