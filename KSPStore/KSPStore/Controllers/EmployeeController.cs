@@ -26,7 +26,7 @@ namespace KSPStore.Controllers
         // Get all employees
         public IActionResult Index()
         {
-            var employees = _db.GetAll().ToList();
+            var employees = _db.GetAll();
             return View(employees);
         }
 
@@ -49,6 +49,7 @@ namespace KSPStore.Controllers
         }
 
         // For testing purpose SqlCommandBuilder
+        #region GetEmpSearchAndUpdate
         public IActionResult GetEmpSearchAndUpdate(int? id)
         {
             var model = _db.LoadEmpById(id);
@@ -64,6 +65,7 @@ namespace KSPStore.Controllers
             _db.UpdateEmpTesting(model);
             return RedirectToAction(nameof(GetEmpSearchAndUpdate), new { id = model.Id});
         }
+        #endregion
 
 
 
@@ -124,8 +126,53 @@ namespace KSPStore.Controllers
         [HttpGet]
         public IActionResult GetValueFromDiffTable()
         {
-            var model = _db.GetAllValueFromDifferentTable();
+            var model = _db.GetAllValueFromDifferentTableViaDataAdapter();
             return View(model);
         }
+
+
+
+
+
+
+        #region Disconnected Model
+        // For disconnected model
+        public IActionResult DMIndex()
+        {
+            var model = _db.GetAllEmployeeUsingDisconnectedModel();
+            return View(model);
+        }
+
+        // for Update
+        [HttpGet]
+        public IActionResult DMUpdate(int id)
+        {
+           var model = _db.FindByIdUsingDM(id);
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult DMUpdate(Employee model)
+        {
+            _db.UpdateUsingDM(model);
+            return RedirectToAction(nameof(DMIndex));
+        }
+
+        // for delete
+        public IActionResult DMDelete(int id)
+        {
+            _db.DeleteUsingDM(id);
+            
+            return RedirectToAction(nameof(DMIndex));
+        }
+
+        // for final update into DB
+        [HttpPost]
+        public IActionResult DMFinalUpdate()
+        {
+           var count = _db.UpdatePermanentIntoDBUsingDM();
+            ViewBag.Count = count;
+            return RedirectToAction(nameof(DMIndex));
+        }
+        #endregion
     }
 }

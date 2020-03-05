@@ -3,12 +3,11 @@ using KSPStore.ViewModel.Employee;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
-using System.Web.Providers.Entities;
 
 namespace KSPStore.DataProvider
 {
@@ -16,7 +15,7 @@ namespace KSPStore.DataProvider
     public class DababaseConfigurationProvider
     {
         // For set database configuration
-        public string conString = "server=(localdb)\\MSSQLLocalDB;database=kspStoreDB_0001; Trusted_Connection=true";
+        // public string conString = "server=(localdb)\\MSSQLLocalDB;database=kspStoreDB_0001; Trusted_Connection=true";
 
         // IMemoryCache
         public static IMemoryCache cache;
@@ -33,6 +32,7 @@ namespace KSPStore.DataProvider
             // for get configuration connectionString from appsettings.json
             con.ConnectionString = Configuration.GetConnectionString("KspStoreDBCon");
             cmd = con.CreateCommand();
+
         }
         // insert method
         public void Insert(Employee model)
@@ -142,19 +142,53 @@ namespace KSPStore.DataProvider
             return model;
         }
 
+        //For testing purpose Get All values from DB
+        public IEnumerable<Employee> GetAllViaDataAdapter()
+        {
+            List<Employee> empList = new List<Employee>();
+            try
+            {
+                string query = "select * from Employee";
+                SqlConnection co = new SqlConnection(Configuration.GetConnectionString("KspStoreDBCon"));
+                SqlDataAdapter dataAdapter = new SqlDataAdapter(query, co);
+
+                DataSet dataSet = new DataSet();
+                dataAdapter.Fill(dataSet, "Emp");
+
+                foreach (DataRow data in dataSet.Tables["Emp"].Rows)
+                {
+                    var model = new Employee
+                    {
+                        Id = (int)data["Id"],
+                        Name = data["Name"].ToString(),
+                        UserName = data["UserName"].ToString(),
+                        Address = data["Address"].ToString(),
+                        Email = data["Email"].ToString()
+                    };
+                    empList.Add(model);
+                }
+
+            }
+            finally
+            {
+                con.Close();
+            }
+            return empList;
+        }
+
         // For testing purpose get via id
         public Employee GetByIdTesting(int id)
         {
             string query = "select * from Employee where Id = " + id;
-            SqlConnection co = new SqlConnection(conString);
+            SqlConnection co = new SqlConnection(Configuration.GetConnectionString("KspStoreDBCon"));
             SqlDataAdapter dataAdapter = new SqlDataAdapter(query, co);
-            
+
             DataSet dataSet = new DataSet();
             var model = new Employee();
 
             try
             {
-                
+
                 dataAdapter.Fill(dataSet, "Emp");
                 foreach (DataRow row in dataSet.Tables["Emp"].Rows)
                 {
@@ -165,7 +199,7 @@ namespace KSPStore.DataProvider
                     model.Address = row["Address"].ToString();
                 }
 
-                
+
             }
             finally
             {
@@ -175,12 +209,7 @@ namespace KSPStore.DataProvider
             return model;
         }
 
-        // For testing purpose IMemoryCache
-        public void Test()
-        {
-            SqlCommandBuilder builder = new SqlCommandBuilder();
-          
-        }
+
         //For testing purpose SqlCommandBuilder
         public Employee LoadEmpById(int? id)
         {
@@ -190,7 +219,7 @@ namespace KSPStore.DataProvider
                 return new Employee();
             }
             string query = "select * from Employee where Id = " + id;
-            SqlConnection co = new SqlConnection(conString);
+            SqlConnection co = new SqlConnection(Configuration.GetConnectionString("KspStoreDBCon"));
             SqlDataAdapter dataAdapter = new SqlDataAdapter(query, co);
             DataSet ds = new DataSet();
 
@@ -202,7 +231,7 @@ namespace KSPStore.DataProvider
             if (ds.Tables["Emp"].Rows.Count > 0)
             {
                 DataRow dataRow = ds.Tables["Emp"].Rows[0];
-                 model = new Employee
+                model = new Employee
                 {
                     Id = (int)dataRow["Id"],
                     Name = dataRow["Name"].ToString(),
@@ -210,14 +239,15 @@ namespace KSPStore.DataProvider
                     Address = dataRow["Address"].ToString(),
                     Email = dataRow["Email"].ToString()
                 };
-               
+
             }
             return model;
-           
+
         }
+        // for testing purpose
         public void UpdateEmpTesting(Employee model)
         {
-            SqlConnection co = new SqlConnection(conString);
+            SqlConnection co = new SqlConnection(Configuration.GetConnectionString("KspStoreDBCon"));
             SqlDataAdapter dataAdapter = new SqlDataAdapter(cache.Get("query").ToString(), co);
 
             SqlCommandBuilder builder = new SqlCommandBuilder(dataAdapter);
@@ -228,9 +258,9 @@ namespace KSPStore.DataProvider
             dr["Address"] = model.Address;
             dr["Email"] = model.Email;
 
-            int rowsUpdated = dataAdapter.Update(ds, "Emp");
-            
-        } 
+            dataAdapter.Update(ds, "Emp");
+
+        }
 
         // Delete method via id
         public void Delete(int id)
@@ -304,7 +334,234 @@ namespace KSPStore.DataProvider
             }
             return newDataFromTwoTable;
         }
+
+
+
+        // testing purpose: Get value from two different table
+        public ReadTwoTableDataConcurrently GetAllValueFromDifferentTableViaDataAdapter()
+        {
+            ReadTwoTableDataConcurrently newDataFromTwoTable;
+
+            string query = "select * from Employee; select * from EmpTags";
+            SqlConnection co = new SqlConnection(Configuration.GetConnectionString("KspStoreDBCon"));
+            SqlDataAdapter dataAdapter = new SqlDataAdapter(query, co);
+            DataSet dataSet = new DataSet();
+
+            dataAdapter.Fill(dataSet);
+            dataSet.Tables[0].TableName = "Emp";
+            dataSet.Tables[1].TableName = "Tags";
+
+            List<Employee> employees = new List<Employee>();
+            // read first table data
+            foreach (DataRow em in dataSet.Tables["Emp"].Rows)
+            {
+                var emp = new Employee
+                {
+                    Id = (int)em["Id"],
+                    Name = em["Name"].ToString(),
+                    UserName = em["UserName"].ToString(),
+                    Address = em["Address"].ToString(),
+                    Email = em["Email"].ToString()
+                };
+                employees.Add(emp);
+            }
+
+
+            List<NewClass> secondData = new List<NewClass>();
+            //read second table data
+            foreach (DataRow em in dataSet.Tables["Tags"].Rows)
+            {
+                var ob = new NewClass
+                {
+                    Id = (int)em["Id"],
+                    CategoryName = em["CategoryName"].ToString()
+                };
+                secondData.Add(ob);
+            }
+
+            newDataFromTwoTable = new ReadTwoTableDataConcurrently
+            {
+                Employees = employees,
+                NewClasses = secondData
+            };
+
+
+
+            return newDataFromTwoTable;
+        }
+
+        // For Disconnected Model
+        #region Disconnected Model
+        public List<Employee> GetAllEmployeeUsingDisconnectedModel()
+        {
+            if (cache.Get("model") != null)
+            {
+                return GetAllEmpUsingDM();
+            }
+            string query = "select * from Employee";
+            string conString1 = Configuration.GetConnectionString("KspStoreDBCon");
+            SqlConnection con1 = new SqlConnection(conString1);
+            SqlDataAdapter dataAdapter = new SqlDataAdapter(query, con1);
+            DataSet dataSet = new DataSet();
+
+            dataAdapter.Fill(dataSet, "Emp");
+            dataSet.Tables["Emp"].PrimaryKey = new DataColumn[] { dataSet.Tables["Emp"].Columns["Id"] };// set primary key
+
+            // caching DB value
+            cache.Set("model", dataSet);
+
+            List<Employee> employees = new List<Employee>();
+            // read data from DataSet object
+            foreach (DataRow em in dataSet.Tables["Emp"].Rows)
+            {
+                var emp = new Employee
+                {
+                    Id = (int)em["Id"],
+                    Name = em["Name"].ToString(),
+                    UserName = em["UserName"].ToString(),
+                    Address = em["Address"].ToString(),
+                    Email = em["Email"].ToString(),
+                    Password = em["Password"].ToString()
+                };
+                employees.Add(emp);
+            }
+            return employees;
+        }
+        // For above method
+        private List<Employee> GetAllEmpUsingDM()
+        {
+            DataSet dataSet = (DataSet)cache.Get("model");
+            List<Employee> employees = new List<Employee>();
+            // read data from DataSet object
+            foreach (DataRow em in dataSet.Tables["Emp"].Rows)
+            {
+                if (em.RowState != DataRowState.Deleted)
+                {
+                    var emp = new Employee
+                    {
+                        Id = (int)em["Id"],
+                        Name = em["Name"].ToString(),
+                        UserName = em["UserName"].ToString(),
+                        Address = em["Address"].ToString(),
+                        Email = em["Email"].ToString(),
+                        Password = em["Password"].ToString()
+                    };
+                    employees.Add(emp);
+                }
+                
+            }
+            return employees;
+
+        }
+
+        public void UpdateUsingDM(Employee model)
+        {
+            if (cache.Get("model") != null)
+            {
+                DataSet dataSet = (DataSet)cache.Get("model");
+
+                DataRow dataRow = dataSet.Tables["Emp"].Rows.Find(model.Id);
+                dataRow["Name"] = model.Name;
+                dataRow["UserName"] = model.UserName;
+                dataRow["Address"] = model.Address;
+                dataRow["Email"] = model.Email;
+
+                // Overwrite the dataset in cache
+                cache.Set("model", dataSet);
+            }
+
+
+        }
+        // get value via id
+        public Employee FindByIdUsingDM(int id)
+        {
+            DataSet dataSet = (DataSet)cache.Get("model");
+
+            DataRow dataRow = dataSet.Tables["Emp"].Rows.Find(id);
+            var model = new Employee
+            {
+                Id = (int)dataRow["Id"],
+                Name = dataRow["Name"].ToString(),
+                UserName = dataRow["UserName"].ToString(),
+                Address = dataRow["Address"].ToString(),
+                Email = dataRow["Email"].ToString(),
+                Password = dataRow["Password"].ToString()
+            };
+            return model;
+
+        }
+        public void DeleteUsingDM(int id)
+        {
+
+            if (cache.Get("model") != null)
+            {
+                DataSet dataSet = (DataSet)cache.Get("model");
+
+                dataSet.Tables["Emp"].Rows.Find(id).Delete();// delete value
+
+                // Overwrite the dataset in cache
+                cache.Set("model", dataSet);
+
+            }
+
+
+        }
+
+        // Final permanently update cache into database & clear cache
+        public int UpdatePermanentIntoDBUsingDM()
+        {
+            int count = 0;
+            if (cache.Get("model") != null)
+            {
+
+                string conString1 = Configuration.GetConnectionString("KspStoreDBCon");
+                SqlConnection con1 = new SqlConnection(conString1);
+                string query = "select * from Employee";
+                SqlDataAdapter dataAdapter = new SqlDataAdapter(query, con1);
+
+                DataSet ds = (DataSet)cache.Get("model");
+
+                //insert command
+                string strInsert = "insert into Employee values(@Name,@UserName,@Address,@Email,@Password)";
+                SqlCommand insertCommand = new SqlCommand(strInsert, con1);
+                insertCommand.Parameters.Add("@Name", SqlDbType.NVarChar, 50, "Name");
+                insertCommand.Parameters.Add("@UserName", SqlDbType.NVarChar, 50, "UserName");
+                insertCommand.Parameters.Add("@Address", SqlDbType.NVarChar, 60, "Address");
+                insertCommand.Parameters.Add("@Email", SqlDbType.NVarChar, 50, "Email");
+                insertCommand.Parameters.Add("@Password", SqlDbType.NVarChar, 50, "Password");
+                dataAdapter.InsertCommand = insertCommand;
+
+                //update command
+                string strUpdate = "Update Employee set Name=@Name, UserName=@UserName, Address=@Address," +
+                    " Email=@Email, Password=@Password where Id=@Id";
+                SqlCommand updateCommand = new SqlCommand(strUpdate, con1);
+                updateCommand.Parameters.Add("@Name", SqlDbType.NVarChar, 50, "Name");
+                updateCommand.Parameters.Add("@UserName", SqlDbType.NVarChar, 50, "UserName");
+                updateCommand.Parameters.Add("@Address", SqlDbType.NVarChar, 60, "Address");
+                updateCommand.Parameters.Add("@Email", SqlDbType.NVarChar, 50, "Email");
+                updateCommand.Parameters.Add("@Password", SqlDbType.NVarChar, 50, "Password");
+                updateCommand.Parameters.Add("@Id", SqlDbType.Int, 0, "Id");
+                dataAdapter.UpdateCommand = updateCommand;
+
+                // delete command
+                string strDelete = "Delete from Employee where Id=@Id";
+                SqlCommand deleteCommand = new SqlCommand(strDelete, con1);
+                deleteCommand.Parameters.Add("@Id", SqlDbType.Int, 0, "Id");
+                dataAdapter.DeleteCommand = deleteCommand;
+
+                count = dataAdapter.Update(ds, "Emp");
+
+            }
+            return count;
+
+        }
+        #endregion
+
     }
+
+
+
+
     // testing purpose: Get value from two different table
     public class NewClass
     {
