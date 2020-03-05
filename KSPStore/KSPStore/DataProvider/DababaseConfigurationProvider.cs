@@ -1,6 +1,7 @@
 ﻿using KSPStore.Models;
 using KSPStore.ViewModel.Employee;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -16,6 +17,9 @@ namespace KSPStore.DataProvider
     {
         // For set database configuration
         public string conString = "server=(localdb)\\MSSQLLocalDB;database=kspStoreDB_0001; Trusted_Connection=true";
+
+        // IMemoryCache
+        public static IMemoryCache cache;
 
 
         public static IConfiguration Configuration;
@@ -158,9 +162,10 @@ namespace KSPStore.DataProvider
                     model.Name = row["Name"].ToString();
                     model.UserName = row["UserName"].ToString();
                     model.Email = row["Email"].ToString();
+                    model.Address = row["Address"].ToString();
                 }
 
-
+                
             }
             finally
             {
@@ -171,8 +176,61 @@ namespace KSPStore.DataProvider
         }
 
         // For testing purpose IMemoryCache
-        
+        public void Test()
+        {
+            SqlCommandBuilder builder = new SqlCommandBuilder();
+          
+        }
+        //For testing purpose SqlCommandBuilder
+        public Employee LoadEmpById(int? id)
+        {
+            Employee model = null;
+            if (id == null)
+            {
+                return new Employee();
+            }
+            string query = "select * from Employee where Id = " + id;
+            SqlConnection co = new SqlConnection(conString);
+            SqlDataAdapter dataAdapter = new SqlDataAdapter(query, co);
+            DataSet ds = new DataSet();
 
+            dataAdapter.Fill(ds, "Emp");
+
+            cache.Set("query", query);
+            cache.Set("dataset", ds);
+
+            if (ds.Tables["Emp"].Rows.Count > 0)
+            {
+                DataRow dataRow = ds.Tables["Emp"].Rows[0];
+                 model = new Employee
+                {
+                    Id = (int)dataRow["Id"],
+                    Name = dataRow["Name"].ToString(),
+                    UserName = dataRow["UserName"].ToString(),
+                    Address = dataRow["Address"].ToString(),
+                    Email = dataRow["Email"].ToString()
+                };
+               
+            }
+            return model;
+           
+        }
+        public void UpdateEmpTesting(Employee model)
+        {
+            SqlConnection co = new SqlConnection(conString);
+            SqlDataAdapter dataAdapter = new SqlDataAdapter(cache.Get("query").ToString(), co);
+
+            SqlCommandBuilder builder = new SqlCommandBuilder(dataAdapter);
+            DataSet ds = (DataSet)cache.Get("dataset");
+            DataRow dr = ds.Tables["Emp"].Rows[0];
+            dr["Name"] = model.Name;
+            dr["UserName"] = model.UserName;
+            dr["Address"] = model.Address;
+            dr["Email"] = model.Email;
+
+            int rowsUpdated = dataAdapter.Update(ds, "Emp");
+            
+        } 
 
         // Delete method via id
         public void Delete(int id)

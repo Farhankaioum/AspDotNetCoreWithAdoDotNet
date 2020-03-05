@@ -18,10 +18,11 @@ namespace KSPStore.Controllers
         public EmployeeController(IMemoryCache cache)
         {
             _cache = cache;
-            
+
+            DababaseConfigurationProvider.cache = _cache;
         }
 
-
+        
         // Get all employees
         public IActionResult Index()
         {
@@ -46,6 +47,26 @@ namespace KSPStore.Controllers
             }
             return View(model);
         }
+
+        // For testing purpose SqlCommandBuilder
+        public IActionResult GetEmpSearchAndUpdate(int? id)
+        {
+            var model = _db.LoadEmpById(id);
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult GetEmpSearchAndUpdateAutoUpdated(Employee model)
+        {
+            if (model == null)
+            {
+                return View(model);
+            }
+            _db.UpdateEmpTesting(model);
+            return RedirectToAction(nameof(GetEmpSearchAndUpdate), new { id = model.Id});
+        }
+
+
+
 
         //Get employee via id
         public IActionResult Detail(int id)
