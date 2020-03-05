@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using KSPStore.DataProvider;
 using KSPStore.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 
 namespace KSPStore.Controllers
@@ -12,6 +13,14 @@ namespace KSPStore.Controllers
     public class EmployeeController : Controller
     {
         private DababaseConfigurationProvider _db = new DababaseConfigurationProvider();
+        private readonly IMemoryCache _cache;
+
+        public EmployeeController(IMemoryCache cache)
+        {
+            _cache = cache;
+            
+        }
+
 
         // Get all employees
         public IActionResult Index()
@@ -20,10 +29,28 @@ namespace KSPStore.Controllers
             return View(employees);
         }
 
+        // For testing purpose IMemoryCache
+        public IActionResult Index1()
+        {
+            IEnumerable<Employee> model;
+            if (_cache.Get("GetAllEmp") == null)
+            {
+                model = _db.GetAll();
+                _cache.Set("GetAllEmp", model);
+                ViewBag.Msg = "Data Loaded from Database";
+            }
+            else
+            {
+                model = (IEnumerable<Employee>)_cache.Get("GetAllEmp");
+                ViewBag.Msg = "Data Loaded from IMemoryCache";
+            }
+            return View(model);
+        }
+
         //Get employee via id
         public IActionResult Detail(int id)
         {
-            var model = _db.GetById(id);
+            var model = _db.GetByIdTesting(id);
             return View(model);
         }
 

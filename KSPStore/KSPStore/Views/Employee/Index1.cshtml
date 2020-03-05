@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Employee>
+
+<div class="container">
+    <h1>Welcome</h1>
+    <h6 class="ml-5 text-success">@ViewBag.Msg</h6>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>UserName</th>
+                <th>Address</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var emp in Model)
+            {
+                <tr>
+                    <td>@emp.Name</td>
+                    <td>@emp.UserName</td>
+                    <td>@emp.Address</td>
+                    <td>@emp.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

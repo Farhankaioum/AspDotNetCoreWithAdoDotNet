@@ -1,10 +1,13 @@
 ﻿using KSPStore.Models;
 using KSPStore.ViewModel.Employee;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
+using System.Web.Providers.Entities;
 
 namespace KSPStore.DataProvider
 {
@@ -104,6 +107,7 @@ namespace KSPStore.DataProvider
         public Employee GetById(int id)
         {
             string query = "select * from Employee where Id = " + id;
+
             cmd.CommandText = query;
             var model = new Employee();
 
@@ -111,6 +115,7 @@ namespace KSPStore.DataProvider
             {
                 con.Open();
                 var data = cmd.ExecuteReader();
+
 
                 while (data.Read())
                 {
@@ -132,6 +137,42 @@ namespace KSPStore.DataProvider
 
             return model;
         }
+
+        // For testing purpose get via id
+        public Employee GetByIdTesting(int id)
+        {
+            string query = "select * from Employee where Id = " + id;
+            SqlConnection co = new SqlConnection(conString);
+            SqlDataAdapter dataAdapter = new SqlDataAdapter(query, co);
+            
+            DataSet dataSet = new DataSet();
+            var model = new Employee();
+
+            try
+            {
+                
+                dataAdapter.Fill(dataSet, "Emp");
+                foreach (DataRow row in dataSet.Tables["Emp"].Rows)
+                {
+                    model.Id = Convert.ToInt32(row["Id"]);
+                    model.Name = row["Name"].ToString();
+                    model.UserName = row["UserName"].ToString();
+                    model.Email = row["Email"].ToString();
+                }
+
+
+            }
+            finally
+            {
+                con.Close();
+            }
+
+            return model;
+        }
+
+        // For testing purpose IMemoryCache
+        
+
 
         // Delete method via id
         public void Delete(int id)
@@ -180,17 +221,17 @@ namespace KSPStore.DataProvider
 
                 // testing purpose: Get value from two different table
                 List<NewClass> secondData = new List<NewClass>();
-                    reader.NextResult();
-                    while (reader.Read())
+                reader.NextResult();
+                while (reader.Read())
+                {
+                    var data = new NewClass
                     {
-                        var data = new NewClass
-                        {
-                            Id = (int)reader["Id"],
-                            CategoryName = reader["CategoryName"].ToString()
-                        };
-                        secondData.Add(data);
-                    }
-                
+                        Id = (int)reader["Id"],
+                        CategoryName = reader["CategoryName"].ToString()
+                    };
+                    secondData.Add(data);
+                }
+
                 newDataFromTwoTable = new ReadTwoTableDataConcurrently
                 {
                     Employees = employees,
