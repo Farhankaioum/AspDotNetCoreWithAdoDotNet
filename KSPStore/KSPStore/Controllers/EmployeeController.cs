@@ -7,22 +7,23 @@ using KSPStore.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace KSPStore.Controllers
 {
     public class EmployeeController : Controller
     {
-        private DababaseConfigurationProvider _db = new DababaseConfigurationProvider();
+        
         private readonly IMemoryCache _cache;
-
+        
         public EmployeeController(IMemoryCache cache)
         {
             _cache = cache;
-
             DababaseConfigurationProvider.cache = _cache;
         }
 
-        
+        private DababaseConfigurationProvider _db = new DababaseConfigurationProvider();
+
         // Get all employees
         public IActionResult Index()
         {
@@ -174,5 +175,17 @@ namespace KSPStore.Controllers
             return RedirectToAction(nameof(DMIndex));
         }
         #endregion
+
+        public IActionResult InsertXmlToDB()
+        {
+            _db.CopyDataXmlToDBTable();
+            return RedirectToAction(nameof(DMIndex));
+        }
+
+        public IActionResult InsertOneTableToAnother()
+        {
+            _db.CopyDateOneTableToAnother();
+            return RedirectToAction(nameof(DMIndex));
+        }
     }
 }

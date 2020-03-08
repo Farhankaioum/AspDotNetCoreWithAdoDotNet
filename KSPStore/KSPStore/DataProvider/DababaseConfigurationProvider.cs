@@ -3,17 +3,20 @@ using KSPStore.ViewModel.Employee;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.IO;
 
 namespace KSPStore.DataProvider
 {
 
     public class DababaseConfigurationProvider
     {
+
         // For set database configuration
         // public string conString = "server=(localdb)\\MSSQLLocalDB;database=kspStoreDB_0001; Trusted_Connection=true";
 
@@ -26,13 +29,15 @@ namespace KSPStore.DataProvider
         // for ado.net
         public SqlConnection con = new SqlConnection();
         public SqlCommand cmd;
+        public  ILogger<DababaseConfigurationProvider> logger;
+         
 
         public DababaseConfigurationProvider()
         {
             // for get configuration connectionString from appsettings.json
             con.ConnectionString = Configuration.GetConnectionString("KspStoreDBCon");
             cmd = con.CreateCommand();
-
+            
         }
         // insert method
         public void Insert(Employee model)
@@ -390,10 +395,14 @@ namespace KSPStore.DataProvider
             return newDataFromTwoTable;
         }
 
+
+
+
         // For Disconnected Model
         #region Disconnected Model
         public List<Employee> GetAllEmployeeUsingDisconnectedModel()
         {
+
             if (cache.Get("model") != null)
             {
                 return GetAllEmpUsingDM();
@@ -448,7 +457,7 @@ namespace KSPStore.DataProvider
                     };
                     employees.Add(emp);
                 }
-                
+
             }
             return employees;
 
@@ -551,17 +560,123 @@ namespace KSPStore.DataProvider
 
                 count = dataAdapter.Update(ds, "Emp");
 
+                //clear the cache
+
+
             }
             return count;
 
         }
         #endregion
 
+        #region testing SqlBulkCopy
+        public void CopyDataXmlToDBTable()
+        {
+            using SqlConnection con = new SqlConnection(Configuration.GetConnectionString("KspStoreDBCon"));
+
+            DataSet ds = new DataSet();
+            ds.ReadXml(new FileStream("data.xml", FileMode.Open));
+            DataTable dtDept = ds.Tables["Department"];
+            DataTable dtEmp = ds.Tables["Employee"];
+
+            con.Open();
+            using SqlBulkCopy bcdept = new SqlBulkCopy(con);
+            bcdept.DestinationTableName = "tblDepartment";
+            bcdept.ColumnMappings.Add("Id", "Id");
+            bcdept.ColumnMappings.Add("Name", "Name");
+            bcdept.ColumnMappings.Add("Location", "Location");
+            bcdept.WriteToServer(dtDept);
+
+            using SqlBulkCopy bcEmp = new SqlBulkCopy(con);
+            bcEmp.DestinationTableName = "tblEmployee";
+            bcEmp.ColumnMappings.Add("Id", "Id");
+            bcEmp.ColumnMappings.Add("Name", "Name");
+            bcEmp.ColumnMappings.Add("Gender", "Gender");
+            bcEmp.ColumnMappings.Add("DepartmentId", "DepartmentId");
+            bcEmp.WriteToServer(dtEmp);
+
+        }
+
+        public void CopyDateOneTableToAnother()
+        {
+            using SqlConnection sourceCon = new SqlConnection(Configuration.GetConnectionString("KspStoreDBCon"));
+            DataSet ds = new DataSet();
+            SqlCommand cmd = new SqlCommand("select * from Products_Source", sourceCon);
+
+            sourceCon.Open();
+            using SqlDataReader rdr = cmd.ExecuteReader();
+
+            using SqlConnection destinationCon = new SqlConnection(Configuration.GetConnectionString("KspStoreDBCon"));
+
+            using SqlBulkCopy bc = new SqlBulkCopy(destinationCon);
+            bc.BatchSize = 1000;
+            bc.NotifyAfter = 5000;
+            bc.SqlRowsCopied += (sender, e) =>
+            {
+                Console.WriteLine(e.RowsCopied + " loaded...");
+            }; // using anonymous method
+            bc.DestinationTableName = "Products_Destination";
+            destinationCon.Open();
+            bc.WriteToServer(rdr);
+
+        }
+
+     
+
+        #endregion
+
     }
 
 
 
+    public class Transfer<T> : IDisposable
+    {
+        private readonly string connectionString;
 
+        protected readonly SqlConnection _sqlConnection;
+
+        public Transfer(string connectionString)
+        {
+            this.connectionString = connectionString;
+            _sqlConnection.Open();
+        }
+
+        // Transaction using
+        public void TransferBalance(string fromAccount, string ToAccount)
+        {
+            var query = "Update Accounts set Balance = Balance  - 10 where AccountNumber = @AccountNumber";
+            SqlTransaction transaction = _sqlConnection.BeginTransaction();
+            var command = new SqlCommand(query, _sqlConnection, transaction);
+            try
+            {
+                
+                
+                command.Parameters.AddWithValue("@AccountNumber", fromAccount);
+                command.ExecuteNonQuery();
+
+                query = "Update Accounts set Balance = Balance  + 10 where AccountNumber = @AccountNumber";
+                command = new SqlCommand(query, _sqlConnection, transaction);
+                command.ExecuteNonQuery();
+
+                transaction.Commit();
+            }
+            catch 
+            {
+                transaction.Rollback();
+            }
+            
+        }
+
+        public void Dispose()
+        {
+            if (_sqlConnection != null)
+            {
+                if (_sqlConnection.State == ConnectionState.Open)
+                    _sqlConnection.Close();
+                _sqlConnection.Dispose();
+            }
+        }
+    }
     // testing purpose: Get value from two different table
     public class NewClass
     {
