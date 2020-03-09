@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Text;
 
 namespace FormUI
@@ -8,7 +9,8 @@ namespace FormUI
     {
         public static string CnnVal(string connectionName)
         {
-            return "";
+            
+            return ConfigurationManager.ConnectionStrings[connectionName].ConnectionString; 
         }
     }
 }
