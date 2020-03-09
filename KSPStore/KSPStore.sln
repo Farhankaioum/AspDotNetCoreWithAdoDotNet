@@ -9,7 +9,9 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SQLProject", "SQLProject\SQ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormUI", "FormUI\FormUI.csproj", "{DE6995D3-805E-4AD7-8002-7A7DF850C47F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassTemplates", "ClassTemplates\ClassTemplates.csproj", "{792EBBC8-24DB-4F91-A457-C40BCF7114F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassTemplates", "ClassTemplates\ClassTemplates.csproj", "{792EBBC8-24DB-4F91-A457-C40BCF7114F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoWPF", "DemoWPF\DemoWPF.csproj", "{4CD95D0C-5B10-4642-873C-7C5EDEDCB045}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,10 @@ Global
 		{792EBBC8-24DB-4F91-A457-C40BCF7114F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{792EBBC8-24DB-4F91-A457-C40BCF7114F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{792EBBC8-24DB-4F91-A457-C40BCF7114F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CD95D0C-5B10-4642-873C-7C5EDEDCB045}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CD95D0C-5B10-4642-873C-7C5EDEDCB045}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CD95D0C-5B10-4642-873C-7C5EDEDCB045}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CD95D0C-5B10-4642-873C-7C5EDEDCB045}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
