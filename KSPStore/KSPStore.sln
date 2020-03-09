@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassTemplates", "ClassTemp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoWPF", "DemoWPF\DemoWPF.csproj", "{4CD95D0C-5B10-4642-873C-7C5EDEDCB045}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFProjectTemplate", "WPFProjectTemplate\WPFProjectTemplate.csproj", "{20908DB7-11EF-4EAB-BA52-310FF3791537}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFTemplateProject", "WPFTemplateProject\WPFTemplateProject.csproj", "{B74A68AE-3521-45B7-A8DC-8868FA9942BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,10 +43,10 @@ Global
 		{4CD95D0C-5B10-4642-873C-7C5EDEDCB045}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CD95D0C-5B10-4642-873C-7C5EDEDCB045}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CD95D0C-5B10-4642-873C-7C5EDEDCB045}.Release|Any CPU.Build.0 = Release|Any CPU
-		{20908DB7-11EF-4EAB-BA52-310FF3791537}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{20908DB7-11EF-4EAB-BA52-310FF3791537}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{20908DB7-11EF-4EAB-BA52-310FF3791537}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{20908DB7-11EF-4EAB-BA52-310FF3791537}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B74A68AE-3521-45B7-A8DC-8868FA9942BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B74A68AE-3521-45B7-A8DC-8868FA9942BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B74A68AE-3521-45B7-A8DC-8868FA9942BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B74A68AE-3521-45B7-A8DC-8868FA9942BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
