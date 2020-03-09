@@ -10,6 +10,7 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
+using System.Transactions;
 
 namespace KSPStore.DataProvider
 {
@@ -649,7 +650,7 @@ namespace KSPStore.DataProvider
             var command = new SqlCommand(query, _sqlConnection, transaction);
             try
             {
-                
+                using TransactionScope txscope = new TransactionScope(TransactionScopeOption.RequiresNew);
                 
                 command.Parameters.AddWithValue("@AccountNumber", fromAccount);
                 command.ExecuteNonQuery();
