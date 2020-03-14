@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassTemplates", "ClassTemp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoWPF", "DemoWPF\DemoWPF.csproj", "{4CD95D0C-5B10-4642-873C-7C5EDEDCB045}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFTemplateProject", "WPFTemplateProject\WPFTemplateProject.csproj", "{B74A68AE-3521-45B7-A8DC-8868FA9942BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WPFTemplateProject", "WPFTemplateProject\WPFTemplateProject.csproj", "{B74A68AE-3521-45B7-A8DC-8868FA9942BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyInjectionSetup", "DependencyInjectionSetup\DependencyInjectionSetup.csproj", "{C81CEEA1-380B-4A34-86CB-3DB03098E12A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{B74A68AE-3521-45B7-A8DC-8868FA9942BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B74A68AE-3521-45B7-A8DC-8868FA9942BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B74A68AE-3521-45B7-A8DC-8868FA9942BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C81CEEA1-380B-4A34-86CB-3DB03098E12A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C81CEEA1-380B-4A34-86CB-3DB03098E12A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C81CEEA1-380B-4A34-86CB-3DB03098E12A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C81CEEA1-380B-4A34-86CB-3DB03098E12A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
