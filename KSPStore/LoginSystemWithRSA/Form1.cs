@@ -85,6 +85,7 @@ namespace LoginSystemWithRSA
 
         }
 
+        // For Login with AES password hash
         private void BtnLoginAES_Click(object sender, EventArgs e)
         {
             var userName = UserNameTextbox.Text;
