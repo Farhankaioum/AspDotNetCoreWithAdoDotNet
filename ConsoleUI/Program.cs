@@ -11,6 +11,7 @@ namespace ConsoleUI
             businessLogic.ProcessDate();
 
             #region //For Single Responsibility Principle
+
             //StandardMessages.WelcomeMessage();
 
             //Person user = PersonDataCapture.Capture();
@@ -20,7 +21,7 @@ namespace ConsoleUI
             //if (isUserValid == false)
             //{
             //    StandardMessages.EndApplication();
-            //    return; 
+            //    return;
             //}
 
             //AccountGenerator.CreateAccount(user);
