@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -30,14 +31,29 @@ namespace LoginSystemWithRSA
                 string password = UserNameTextbox.Text;
                 string email = EmailTextbox.Text;
 
-                // For Encrypted password
-                var rsaEnc = new RSAConfiguration();
-              // var encryptedPassword = rsaEnc.Encrypt(password);
+                #region for first RSA // For Encrypted password
+                // var rsaEnc = new RSAConfiguration();
+                // var encryptedPassword = rsaEnc.Encrypt(password); // 
 
 
-               var encryptedPassword = AESConfiguration.Encrypt(password); // For AES
+                // var encryptedPassword = AESConfiguration.Encrypt(password); // For AES
 
-                string query = "insert into tblUserRegistration values('"+userName+"', '"+encryptedPassword+"', '"+email+"')";
+                #endregion
+
+                #region For msdn RSACSPSample
+                byte[] dataToEncrypt = Encoding.ASCII.GetBytes(password);
+                string hashPassword = string.Empty;
+                using(RSACryptoServiceProvider RSA = new RSACryptoServiceProvider())
+                {
+                    var encryptedData = RSACSPSample.RSAEncrypt(dataToEncrypt, RSA.ExportParameters(false), false);
+                    hashPassword = BitConverter.ToString(encryptedData);
+                }
+
+                #endregion
+
+
+
+                string query = "insert into tblUserRegistration values('"+userName+"', '"+ hashPassword + "', '"+email+"')";
                 SqlCommand cmd = new SqlCommand(query, con);
 
                 try

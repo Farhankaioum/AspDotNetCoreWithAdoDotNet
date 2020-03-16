@@ -2,6 +2,8 @@
 using System;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.Security.Cryptography;
+using System.Text;
 using System.Windows.Forms;
 
 namespace LoginSystemWithRSA
@@ -28,8 +30,9 @@ namespace LoginSystemWithRSA
             var userName = UserNameTextbox.Text;
             var password = PasswordTextBox.Text;
 
-            // For Encrypted password
-            var rsaEnc = new RSAConfiguration();
+
+            //// For Encrypted password
+            //var rsaEnc = new RSAConfiguration();
             
 
             connectionString = ConfigurationManager.ConnectionStrings["LoginSystemWithRSA"].ConnectionString;
@@ -37,12 +40,12 @@ namespace LoginSystemWithRSA
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 string query = "select * from tblUserRegistration where UserName = '"+userName+"'";
-                string cypher = string.Empty;
                 
                 SqlCommand cmd = new SqlCommand(query, con);
 
                 try
                 {
+
                     con.Open();
                     var reader = cmd.ExecuteReader();
                     if (reader != null)
@@ -51,8 +54,25 @@ namespace LoginSystemWithRSA
                         while (reader.Read())
                         {
                             string tempPass = reader["Password"].ToString();
-                            cypher = rsaEnc.Decrypt(tempPass);
-                            if (tempPass == password)
+
+                            string unhashPassword = string.Empty;
+
+
+                            #region For msdn RSACSPSample
+                            string tempPassword = reader["Password"].ToString();
+                            var dataToEncrypt = Encoding.ASCII.GetBytes(tempPassword);
+
+                            using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider())
+                            {
+                                var decryptedData = RSACSPSample.RSADecrypt(dataToEncrypt, RSA.ExportParameters(true), false);
+                                unhashPassword = BitConverter.ToString(decryptedData);
+                            }
+
+                            #endregion
+
+
+
+                            if (unhashPassword == password)
                             {
                                 count++;
                                 break;
@@ -164,6 +184,11 @@ namespace LoginSystemWithRSA
 
                 }
             }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            
         }
     }
 }

@@ -46,8 +46,9 @@ namespace LoginSystemWithRSA.Security
         public string Decrypt(string cypterText)
         {
             var dataBytes = Convert.FromBase64String(cypterText);
+            rsa = new RSACryptoServiceProvider();
             rsa.ImportParameters(_privateKey);
-            var plaintext = rsa.Decrypt(dataBytes, false);
+            var plaintext = rsa.Decrypt(dataBytes, false);// problem here
 
             return Encoding.Unicode.GetString(plaintext);
         }

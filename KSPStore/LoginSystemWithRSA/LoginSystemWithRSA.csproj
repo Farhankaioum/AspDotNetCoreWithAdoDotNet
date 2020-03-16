@@ -80,6 +80,7 @@
     </Compile>
     <Compile Include="Security\AESConfiguration.cs" />
     <Compile Include="Security\RSAConfiguration.cs" />
+    <Compile Include="Security\RSACSPSample.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
