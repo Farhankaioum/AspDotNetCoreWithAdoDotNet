@@ -89,7 +89,7 @@ namespace LoginSystemWithRSA
         {
             var userName = UserNameTextbox.Text;
             var password = PasswordTextBox.Text;
-
+            var encPassword = AESConfiguration.Encrypt(password);
            
 
 
@@ -97,7 +97,9 @@ namespace LoginSystemWithRSA
 
             using (SqlConnection con = new SqlConnection(connectionString))
             {
-                string query = "select * from tblUserRegistration where UserName = '" + userName + "'";
+
+
+                string query = "select * from tblUserRegistration where UserName = '" + userName + "' and Password='"+encPassword+"'";
                 string cypher = string.Empty;
 
                 SqlCommand cmd = new SqlCommand(query, con);
@@ -105,33 +107,51 @@ namespace LoginSystemWithRSA
                 try
                 {
                     con.Open();
-                    var reader = cmd.ExecuteReader();
-                    if (reader != null)
-                    {
-                        int count = 0;
-                        while (reader.Read())
-                        {
-                            string tempPass = reader["Password"].ToString();
-                            cypher = AESConfiguration.Decrypt(tempPass);
-                            if (cypher == password)
-                            {
-                                count++;
-                                break;
-                            }
 
-                        }
-                        if (count > 0)
-                        {
-                            var homePage = new HomePage();
-                            homePage.ShowDialog();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Invalid username or password!");
-                        }
+                    var reader = cmd.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        var homePage = new HomePage();
+                        homePage.ShowDialog();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to login");
                     }
 
                     reader.Close();
+
+
+
+
+                    //con.Open();
+                    //var reader = cmd.ExecuteReader();
+                    //if (reader != null)
+                    //{
+                    //    int count = 0;
+                    //    while (reader.Read())
+                    //    {
+                    //        string tempPass = reader["Password"].ToString();
+                    //        cypher = AESConfiguration.Decrypt(tempPass);
+                    //        if (cypher == password)
+                    //        {
+                    //            count++;
+                    //            break;
+                    //        }
+
+                    //    }
+                    //    if (count > 0)
+                    //    {
+                    //        var homePage = new HomePage();
+                    //        homePage.ShowDialog();
+                    //    }
+                    //    else
+                    //    {
+                    //        MessageBox.Show("Invalid username or password!");
+                    //    }
+                    //}
+
+                    //reader.Close();
                 }
                 catch (Exception ex)
                 {
