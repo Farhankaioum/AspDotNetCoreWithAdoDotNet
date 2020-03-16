@@ -11,14 +11,14 @@ namespace LoginSystemWithRSA.Security
 {
     public class RSAConfiguration
     {
-        private static RSACryptoServiceProvider csp = new RSACryptoServiceProvider(2048);
+        private static RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(2048);
         private RSAParameters _privateKey;
         private RSAParameters _publicKey;
 
         public RSAConfiguration()
         {
-            _privateKey = csp.ExportParameters(true);
-            _publicKey = csp.ExportParameters(false);
+            _privateKey = rsa.ExportParameters(true);
+            _publicKey = rsa.ExportParameters(false);
         }
 
 
@@ -33,11 +33,11 @@ namespace LoginSystemWithRSA.Security
 
         public string Encrypt(string plainText)
         {
-            csp = new RSACryptoServiceProvider();
-            csp.ImportParameters(_publicKey);
+            rsa = new RSACryptoServiceProvider();
+            rsa.ImportParameters(_publicKey);
 
             var data = Encoding.Unicode.GetBytes(plainText);
-            var cypher = csp.Encrypt(data, false);
+            var cypher = rsa.Encrypt(data, false);
 
             return Convert.ToBase64String(cypher);
 
@@ -46,8 +46,8 @@ namespace LoginSystemWithRSA.Security
         public string Decrypt(string cypterText)
         {
             var dataBytes = Convert.FromBase64String(cypterText);
-            csp.ImportParameters(_privateKey);
-            var plaintext = csp.Decrypt(dataBytes, false);
+            rsa.ImportParameters(_privateKey);
+            var plaintext = rsa.Decrypt(dataBytes, false);
 
             return Encoding.Unicode.GetString(plaintext);
         }

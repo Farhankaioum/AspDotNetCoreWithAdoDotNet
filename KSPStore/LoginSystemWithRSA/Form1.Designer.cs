@@ -34,6 +34,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.PasswordTextBox = new System.Windows.Forms.TextBox();
             this.metroLink1 = new MetroFramework.Controls.MetroLink();
+            this.BtnLoginAES = new MetroFramework.Controls.MetroLink();
             this.SuspendLayout();
             // 
             // UserNameTextbox
@@ -97,11 +98,23 @@
             this.metroLink1.Text = "New here?";
             this.metroLink1.Click += new System.EventHandler(this.metroLink1_Click);
             // 
+            // BtnLoginAES
+            // 
+            this.BtnLoginAES.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.BtnLoginAES.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.BtnLoginAES.Location = new System.Drawing.Point(687, 12);
+            this.BtnLoginAES.Name = "BtnLoginAES";
+            this.BtnLoginAES.Size = new System.Drawing.Size(92, 23);
+            this.BtnLoginAES.TabIndex = 6;
+            this.BtnLoginAES.Text = "Login with AES";
+            this.BtnLoginAES.Click += new System.EventHandler(this.BtnLoginAES_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.BtnLoginAES);
             this.Controls.Add(this.metroLink1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.PasswordTextBox);
@@ -123,6 +136,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox PasswordTextBox;
         private MetroFramework.Controls.MetroLink metroLink1;
+        private MetroFramework.Controls.MetroLink BtnLoginAES;
     }
 }
 

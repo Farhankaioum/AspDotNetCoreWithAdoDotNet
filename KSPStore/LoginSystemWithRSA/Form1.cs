@@ -30,13 +30,14 @@ namespace LoginSystemWithRSA
 
             // For Encrypted password
             var rsaEnc = new RSAConfiguration();
-            var encryptedPassword = rsaEnc.Decrypt(password);
+            
 
             connectionString = ConfigurationManager.ConnectionStrings["LoginSystemWithRSA"].ConnectionString;
 
             using (SqlConnection con = new SqlConnection(connectionString))
             {
-                string query = "select * from tblUserRegistration where UserName = '"+userName+"' and Password='"+encryptedPassword+"'";
+                string query = "select * from tblUserRegistration where UserName = '"+userName+"'";
+                string cypher = string.Empty;
                 
                 SqlCommand cmd = new SqlCommand(query, con);
 
@@ -44,20 +45,36 @@ namespace LoginSystemWithRSA
                 {
                     con.Open();
                     var reader = cmd.ExecuteReader();
-                    if (reader.HasRows)
+                    if (reader != null)
                     {
-                        var homePage = new HomePage();
-                        homePage.ShowDialog();
+                        int count = 0;
+                        while (reader.Read())
+                        {
+                            string tempPass = reader["Password"].ToString();
+                            cypher = rsaEnc.Decrypt(tempPass);
+                            if (tempPass == password)
+                            {
+                                count++;
+                                break;
+                            }
+
+                        }
+                        if (count > 0)
+                        {
+                            var homePage = new HomePage();
+                            homePage.ShowDialog();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Invalid username or password!");
+                        }
                     }
-                    else
-                    {
-                        MessageBox.Show("Invalid username or password!");
-                    }
+
                     reader.Close();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Exception occured: " + ex.Message);
+                    MessageBox.Show("Exception occured: " + ex);
                 }
                 finally
                 {
@@ -66,6 +83,66 @@ namespace LoginSystemWithRSA
                 }
             }
 
+        }
+
+        private void BtnLoginAES_Click(object sender, EventArgs e)
+        {
+            var userName = UserNameTextbox.Text;
+            var password = PasswordTextBox.Text;
+
+           
+
+
+            connectionString = ConfigurationManager.ConnectionStrings["LoginSystemWithRSA"].ConnectionString;
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                string query = "select * from tblUserRegistration where UserName = '" + userName + "'";
+                string cypher = string.Empty;
+
+                SqlCommand cmd = new SqlCommand(query, con);
+
+                try
+                {
+                    con.Open();
+                    var reader = cmd.ExecuteReader();
+                    if (reader != null)
+                    {
+                        int count = 0;
+                        while (reader.Read())
+                        {
+                            string tempPass = reader["Password"].ToString();
+                            cypher = AESConfiguration.Decrypt(tempPass);
+                            if (cypher == password)
+                            {
+                                count++;
+                                break;
+                            }
+
+                        }
+                        if (count > 0)
+                        {
+                            var homePage = new HomePage();
+                            homePage.ShowDialog();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Invalid username or password!");
+                        }
+                    }
+
+                    reader.Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Exception occured: " + ex);
+                }
+                finally
+                {
+                    con.Close();
+
+                }
+            }
         }
     }
 }

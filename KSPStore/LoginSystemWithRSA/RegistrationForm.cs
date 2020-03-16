@@ -32,7 +32,10 @@ namespace LoginSystemWithRSA
 
                 // For Encrypted password
                 var rsaEnc = new RSAConfiguration();
-               var encryptedPassword = rsaEnc.Encrypt(password);
+              // var encryptedPassword = rsaEnc.Encrypt(password);
+
+
+               var encryptedPassword = AESConfiguration.Encrypt(password); // For AES
 
                 string query = "insert into tblUserRegistration values('"+userName+"', '"+encryptedPassword+"', '"+email+"')";
                 SqlCommand cmd = new SqlCommand(query, con);
